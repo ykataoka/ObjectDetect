@@ -38,6 +38,7 @@ The peformance of log loss is shown in this figure.
 
 The peformance of the label with image example is shown in next figures. (randomly chosen)
 The road is faily covered within image.
+
 ![example](./result_example/umm_000091.png)
 ![example](./result_example/umm_000092.png)
 ![example](./result_example/umm_000093.png)
