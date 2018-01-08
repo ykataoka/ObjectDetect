@@ -1,6 +1,7 @@
 # Semantic Segmentation
+
 ### Introduction
-In this project, you'll label the pixels of a road in images using a Fully Convolutional Network (FCN).
+In this project, the pixels of a road in images is labeled using a Fully Convolutional Network (FCN).
 
 ### Setup
 ##### Frameworks and Packages
@@ -12,35 +13,43 @@ Make sure you have the following is installed:
 ##### Dataset
 Download the [Kitti Road dataset](http://www.cvlibs.net/datasets/kitti/eval_road.php) from [here](http://www.cvlibs.net/download.php?file=data_road.zip).  Extract the dataset in the `data` folder.  This will create the folder `data_road` with all the training a test images.
 
-### Start
-##### Implement
-Implement the code in the `main.py` module indicated by the "TODO" comments.
-The comments indicated with "OPTIONAL" tag are not required to complete.
-##### Run
+### What this does
+
+1. This code downloads a pre-trained VGG16 model and extract the input, keep probability, layer 3, layer 4 and layer 7 from it (method load_vgg).
+
+2. Those layers are used to create FCNs network to label the road in image. The detail of the network follows.
+ - One convolutional layer with kernel 1 from VGG's layer 7
+ - One deconvolutional layer with kernel 4 and stride 2 from the first convolutional layer
+ - One convolutional layer with kernel 1 from VGG's layer 4
+ - The two layers above are added to create the first skip layer
+ - One deconvolutional layer with kernel 4 and stride 2 from the first ship layer
+ - One convolutional layer with kernel 1 from VGG's layer 3
+ - The two layers above are added to create the second skip layer
+ - One deconvolutional layer with kernel 16 and stride 8 from the second skip layer
+ - Every created convolutional and deconvolutional layer use a random-normal kernel initializer (std 0.01) and a L2 kernel regularizer with 0.001 to avoid overfitting.
+
+3. The optimizer and the cross-entropy lost is defined on the optimize method using Adam optimizer.
+
+4. The network is trained using the train_nn using keep probability 0.5 and learning rate 0.00001. The epoch is chosen to be 20 for early stopping. Batch size is 5.
+
+### Performance
+The peformance of log loss is shown in this figure.
+![logloss](./log_loss.png)
+
+The peformance of the label with image example is shown in next figures. (randomly chosen)
+The road is faily covered within image.
+![example](./result_example/umm_000091.png)
+![example](./result_example/umm_000092.png)
+![example](./result_example/umm_000093.png)
+![example](./result_example/um_000095.png)
+![example](./result_example/um_000094.png)
+![example](./result_example/um_000093.png)
+![example](./result_example/uu_000097.png)
+![example](./result_example/uu_000098.png)
+![example](./result_example/uu_000099.png)
+
+### Run
 Run the following command to run the project:
 ```
 python main.py
 ```
-**Note** If running this in Jupyter Notebook system messages, such as those regarding test status, may appear in the terminal rather than the notebook.
-
-### Submission
-1. Ensure you've passed all the unit tests.
-2. Ensure you pass all points on [the rubric](https://review.udacity.com/#!/rubrics/989/view).
-3. Submit the following in a zip file.
- - `helper.py`
- - `main.py`
- - `project_tests.py`
- - Newest inference images from `runs` folder  (**all images from the most recent run**)
- 
- ### Tips
-- The link for the frozen `VGG16` model is hardcoded into `helper.py`.  The model can be found [here](https://s3-us-west-1.amazonaws.com/udacity-selfdrivingcar/vgg.zip)
-- The model is not vanilla `VGG16`, but a fully convolutional version, which already contains the 1x1 convolutions to replace the fully connected layers. Please see this [forum post](https://discussions.udacity.com/t/here-is-some-advice-and-clarifications-about-the-semantic-segmentation-project/403100/8?u=subodh.malgonde) for more information.  A summary of additional points, follow. 
-- The original FCN-8s was trained in stages. The authors later uploaded a version that was trained all at once to their GitHub repo.  The version in the GitHub repo has one important difference: The outputs of pooling layers 3 and 4 are scaled before they are fed into the 1x1 convolutions.  As a result, some students have found that the model learns much better with the scaling layers included. The model may not converge substantially faster, but may reach a higher IoU and accuracy. 
-- When adding l2-regularization, setting a regularizer in the arguments of the `tf.layers` is not enough. Regularization loss terms must be manually added to your loss function. otherwise regularization is not implemented.
- 
-### Using GitHub and Creating Effective READMEs
-If you are unfamiliar with GitHub , Udacity has a brief [GitHub tutorial](http://blog.udacity.com/2015/06/a-beginners-git-github-tutorial.html) to get you started. Udacity also provides a more detailed free [course on git and GitHub](https://www.udacity.com/course/how-to-use-git-and-github--ud775).
-
-To learn about REAMDE files and Markdown, Udacity provides a free [course on READMEs](https://www.udacity.com/courses/ud777), as well. 
-
-GitHub also provides a [tutorial](https://guides.github.com/features/mastering-markdown/) about creating Markdown files.
